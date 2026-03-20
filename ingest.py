@@ -5,6 +5,7 @@ import json
 from chonkie import RecursiveChunker
 from openai import OpenAI
 import psycopg2
+from psycopg2.extras import DictCursor
 
 load_dotenv()
 
@@ -25,10 +26,10 @@ def load_documents(directory, metadata):
         user=DB_USER,
         password=DB_PASSWORD
     )
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=DictCursor)
     cursor.execute("SELECT metadata FROM documents")
     existing_documents = cursor.fetchall()
-    existing_document_names = [doc[0]["pdf_filename"] for doc in existing_documents]
+    existing_document_names = [doc["metadata"]["pdf_filename"] for doc in existing_documents]
     cursor.close()
     conn.close()
     for filename in sorted(os.listdir(directory)):
@@ -40,6 +41,9 @@ def load_documents(directory, metadata):
         md_text = pymupdf4llm.to_markdown(filepath)
         file_metadata = next((item for item in metadata if item["pdf_filename"] == filename), None)
         file_metadata = {k: v for k, v in file_metadata.items() if k != "abstract"}
+        file_metadata["published_year"] = file_metadata["published"].split("-")[0]
+        file_metadata["published_month"] = file_metadata["published"].split("-")[1]
+        file_metadata["published_day"] = file_metadata["published"].split("-")[2]
         documents.append({
             "text": md_text,
             "source": filename,

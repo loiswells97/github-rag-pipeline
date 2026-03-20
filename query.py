@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from dotenv import load_dotenv
 from openai import OpenAI
 import psycopg2
@@ -18,7 +19,7 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
 openai = OpenAI()
 
-def perform_vector_search(query, k=5):
+def perform_vector_search(query, k=5, metadata_filters={}, relevance_limit=0.5):
     embedding = openai.embeddings.create(
         input=query,
         model="text-embedding-3-small"
@@ -33,7 +34,10 @@ def perform_vector_search(query, k=5):
     )
     register_vector(conn)
     cursor = conn.cursor(cursor_factory=DictCursor)
-    cursor.execute("SELECT *, embedding <-> %s AS similarity FROM documents ORDER BY similarity LIMIT %s", (query_embedding, k))
+    if metadata_filters:
+        cursor.execute("SELECT *, 1 - (embedding <=> %s) AS similarity FROM documents WHERE metadata @> %s AND 1 - (embedding <=> %s) >= %s ORDER BY similarity DESC LIMIT %s", (query_embedding, json.dumps(metadata_filters), query_embedding, relevance_limit, k))
+    else:
+        cursor.execute("SELECT *, 1 - (embedding <=> %s) AS similarity FROM documents WHERE 1 - (embedding <=> %s) >= 1 - %s ORDER BY similarity DESC LIMIT %s", (query_embedding, query_embedding, relevance_limit, k))
     results = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -45,7 +49,7 @@ def generate_response(question, chunks):
 
     context = ""
     for chunk in chunks:
-        context += f"\n--- Chunk {chunk['id']} (Source: {chunk['source']}, Title: {chunk['metadata']['title']}, Authors: {chunk['metadata']['authors']}, Published: {chunk['metadata']['published']}) ---\n{chunk['text']}\n"
+        context += f"\n--- Similarity: {chunk['similarity']} (Source: {chunk['source']}, Title: {chunk['metadata']['title']}, Authors: {chunk['metadata']['authors']}, Published: {chunk['metadata']['published']}) ---\n{chunk['text']}\n"
 
     print(f"Context: {context}")
     response = client.messages.create(
@@ -64,6 +68,7 @@ def generate_response(question, chunks):
 
 if __name__ == "__main__":
     query = " ".join(sys.argv[1:])
+    # results = perform_vector_search(query, metadata_filters={"published_year": "2026", "published_month": "02"})
     results = perform_vector_search(query)
     print(f"Found {len(results)} results")
     response = generate_response(query, results)
