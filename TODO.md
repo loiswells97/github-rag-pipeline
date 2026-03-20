@@ -6,6 +6,6 @@
 - [x] Metadata filtering
 - [x] Add relevance limit
 - [x] Add API routes
-- [ ] Add logging
-- [ ] Docker service for API
+- [x] Add logging
+- [x] Docker service for API
 - [ ] Deploy to server
