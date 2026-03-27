@@ -8,5 +8,5 @@
 - [x] Add API routes
 - [x] Add logging
 - [x] Docker service for API
-- [ ] Deploy to server
+- [x] Deploy to server
 - [x] Ingestion error handling

@@ -50,7 +50,7 @@ def generate_response(question, chunks):
 
     context = ""
     for chunk in chunks:
-        context += f"\n--- Similarity: {chunk['similarity']} (Source: {chunk['source']}, Title: {chunk['metadata']['title']}, Authors: {chunk['metadata']['authors']}, Published: {chunk['metadata']['published']}) ---\n{chunk['text']}\n"
+        context += f"\n--- Similarity: {chunk['similarity']} (Source: {chunk['source']}, Metadata: {chunk['metadata']} ) ---\n{chunk['text']}\n"
 
     response = client.messages.create(
         model="claude-sonnet-4-6",

@@ -12,9 +12,9 @@ def log_results(results):
         print("-"*30)
         print(f"Similarity: {result['similarity']}")
         print(f"Source: {result['source']}")
-        print(f"Title: {result['metadata']['title']}")
-        print(f"Authors: {result['metadata']['authors']}")
-        print(f"Published: {result['metadata']['published']}")
+        # print(f"Title: {result['metadata']['title']}")
+        # print(f"Authors: {result['metadata']['authors']}")
+        # print(f"Published: {result['metadata']['published']}")
         print(f"Text: {result['text']}")
         print("-"*30)
 
