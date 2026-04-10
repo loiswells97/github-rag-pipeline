@@ -89,8 +89,8 @@ def store_embedded_chunks(chunks, batch_size=500):
     cursor.close()
     conn.close()
 
-if __name__ == "__main__":
-    docs = load_documents(GITHUB_REPOSITORY, GITHUB_BRANCH, GITHUB_DIRECTORIES)
+def ingest(github_repository, github_branch, github_directories, skip_existing=True):
+    docs = load_documents(github_repository, github_branch, github_directories, skip_existing=skip_existing)
     print(f"Loaded {len(docs)} documents")
     chunks = chunk_documents(docs)
     print(f"Created {len(chunks)} chunks")
@@ -98,3 +98,6 @@ if __name__ == "__main__":
     print(f"Embedded {len(chunks_with_embeddings)} chunks")
     store_embedded_chunks(chunks_with_embeddings)
     print("Embedded chunks stored successfully")
+
+if __name__ == "__main__":
+    ingest(GITHUB_REPOSITORY, GITHUB_BRANCH, GITHUB_DIRECTORIES)

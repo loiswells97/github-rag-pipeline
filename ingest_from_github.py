@@ -13,7 +13,29 @@ DB_NAME = os.getenv("POSTGRES_DB")
 DB_USER = os.getenv("POSTGRES_USER")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
-def load_documents(repository_name, branch_name="main", directories=[]):
+def filter_files(files, directories):
+    filtered_files = []
+    for directory in directories:
+        for file in files:
+            if file.startswith(directory + "/"):
+                filtered_files.append(file)
+    return filtered_files
+
+def delete_document(source):
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD
+    )
+    cursor = conn.cursor(cursor_factory=DictCursor)
+    cursor.execute("DELETE FROM documents WHERE source = %s", (source,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def load_documents(repository_name, branch_name="main", directories=[], skip_existing=True):
     """Load documents from a GitHub repository."""
     github_client = Github(os.getenv("GITHUB_TOKEN"))
     repo = github_client.get_repo(repository_name)
@@ -29,17 +51,20 @@ def load_documents(repository_name, branch_name="main", directories=[]):
         password=DB_PASSWORD
     )
     cursor = conn.cursor(cursor_factory=DictCursor)
-    cursor.execute("SELECT metadata FROM documents")
+    cursor.execute("SELECT source FROM documents")
     existing_documents = cursor.fetchall()
-    existing_document_paths = [doc["metadata"]["path"] for doc in existing_documents]
-    cursor.close()
-    conn.close()
+    existing_document_paths = [doc["source"] for doc in existing_documents]
     for directory in directories:
-        contents = repo.get_contents(directory, ref=branch_name)
+        response = repo.get_contents(directory, ref=branch_name)
+        contents = response if isinstance(response, list) else [response]
         for content in contents:
             if content.path in existing_document_paths:
-                print(f"Skipping {content.path}")
-                continue
+                if skip_existing:
+                    print(f"Skipping {content.path}")
+                    continue
+                else:
+                    # remove the existing document from the database
+                    delete_document(content.path)
             if content.type == "file":
                 documents.append({
                     "text": content.decoded_content.decode("utf-8"),
@@ -57,4 +82,6 @@ def load_documents(repository_name, branch_name="main", directories=[]):
                         "html_url": content.html_url,
                     })
                 })
+    cursor.close()
+    conn.close()
     return documents

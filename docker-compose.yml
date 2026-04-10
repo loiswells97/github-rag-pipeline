@@ -56,5 +56,13 @@ services:
     volumes:
       - .:/app
     restart: unless-stopped
+  smee:
+    image: deltaprojects/smee-client
+    platform: linux/amd64
+    command: -u $SMEE_WEBHOOK_URL -t http://api:8000/github_webhooks
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
 volumes:
   postgres_data:

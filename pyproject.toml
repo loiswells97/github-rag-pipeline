@@ -15,5 +15,6 @@ dependencies = [
     "pygithub>=2.9.0",
     "pymupdf4llm>=1.27.2.2",
     "python-dotenv>=1.2.2",
+    "python-multipart>=0.0.26",
     "uvicorn>=0.42.0",
 ]
