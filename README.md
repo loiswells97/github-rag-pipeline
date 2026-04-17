@@ -1,1 +1,1 @@
-# arxiv-rag-pipeline
+# github-rag-pipeline
