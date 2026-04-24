@@ -1,0 +1,58 @@
+[
+    {
+      "query": "What are the different types of buttons?",
+      "relevant_chunk_ids": [
+        "82",
+        "103",
+        "100"
+      ],
+      "difficulty": "easy"
+    },
+    {
+        "query": "How do you simulate a keyboard press on the Return key?",
+        "relevant_chunk_ids": [
+          "113",
+          "112",
+          "116",
+          "117"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "query": "How do you add debouncing to a button?",
+        "relevant_chunk_ids": [
+          "91",
+          "92",
+          "95"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "query": "How do capacitative touch sensors work?",
+        "relevant_chunk_ids": [
+          "103",
+          "106",
+          "107",
+          "108",
+          "110"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "query": "What dangers should users bear in mind when programming a Feather?",
+        "relevant_chunk_ids": [
+          "120",
+          "71",
+          "119"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "query": "Which chip is recommended for multiplexing?",
+        "relevant_chunk_ids": [
+          "100"
+        ],
+        "difficulty": "easy"
+      }
+
+  ]

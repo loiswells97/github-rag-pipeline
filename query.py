@@ -55,7 +55,7 @@ def generate_response(question, chunks):
     response = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1024,
-        system="You are a helpful assistant. Answer questions based only on the provided context. If the context doesn't contain enough information to answer, say so. Include citations from the context in academic citation format for every assertion made in the answer.",
+        system="You are a helpful assistant. Answer questions based only on the provided context. If the context doesn't contain enough information to answer, say so. Respond in Github-flavoured markdown format. Include citations from the context in the form of a link to the source document for every assertion made in the answer.",
         messages=[
             {
                 "role": "user",
